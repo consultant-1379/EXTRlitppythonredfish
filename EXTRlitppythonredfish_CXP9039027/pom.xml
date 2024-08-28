@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ericsson.oss.litp.3pps</groupId>
+        <artifactId>EXTRlitppythonredfish</artifactId>
+        <version>2.2.3-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>EXTRlitppythonredfish_CXP9039027</artifactId>
+    <name>[${project.parent.artifactId}] ${project.artifactId} RPM module</name>
+    <description>Python package redfish-2.1.5 packaged by Ericsson</description>
+    <packaging>${rpm.packaging}</packaging>
+
+    <properties>
+        <!-- Publishes the RPM module to the CI portal -->
+        <publish_artifact>true</publish_artifact>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Build the RPM -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <group>ERI-NMS</group>
+                    <needarch>x86_64</needarch>
+                    <requires>
+                        <require>python &gt;= 2.7</require>
+                        <require>EXTRlitppythonjsonpathrw_CXP9039029 &gt;= 1.0.2</require>
+                        <require>EXTRlitppythonjsonpointer_CXP9039028 &gt;= 1.0.9</require>
+                        <require>python-ply &gt;= 3.4</require>
+                    </requires>
+                    <vendor>Ericsson AB</vendor>
+                    <url>www.ericsson.com</url>
+                    <autoRequires>false</autoRequires>
+                    <defineStatements>
+                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+                    </defineStatements>
+                    <defaultFilemode>0755</defaultFilemode>
+                    <defaultDirmode>0755</defaultDirmode>
+                    <defaultUsername>root</defaultUsername>
+                    <defaultGroupname>root</defaultGroupname>
+                    <mappings>
+                        <mapping>
+                            <directory>/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <filemode>755</filemode>
+                            <username>root</username>
+                            <groupname>root</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.build.directory}/../../Builder/target/staging</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                    </mappings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

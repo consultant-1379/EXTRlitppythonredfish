@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ericsson.oss.litp.3pps</groupId>
+        <artifactId>EXTRlitppythonredfish</artifactId>
+        <version>2.2.3-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>Redfish_Builder</artifactId>
+    <name>[${project.parent.artifactId}] ${project.artifactId} Patch &amp; build 3PP source</name>
+    <description>LITP redfish</description>
+    <packaging>pom</packaging>
+
+    <properties>
+        <version.redfish>2.1.5</version.redfish>
+        <tarball_top_source_directory>python-redfish-library-${version.redfish}</tarball_top_source_directory>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Download zip file from nexus and unpack it -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack_redfish</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.python</groupId>
+                                    <artifactId>python-redfish-library</artifactId>
+                                    <version>${version.redfish}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Prepare module  -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <!-- Compile the python module -->
+                    <execution>
+                        <id>run-setup</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <environmentVariables />
+                            <executable>python</executable>
+                            <workingDirectory>${project.build.directory}/${tarball_top_source_directory}</workingDirectory>
+                            <arguments>
+                                <argument>setup.py</argument>
+                                <argument>bdist</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Create a staging directory for the bdist tarball -->
+                    <execution>
+                        <id>create-staging-dir</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mkdir</executable>
+                            <arguments>
+                                <argument>${project.build.directory}/staging</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Extract Distribution-->
+                    <execution>
+                        <id>extract-bdist</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>tar</executable>
+                            <workingDirectory>${project.build.directory}/staging</workingDirectory>
+                            <arguments>
+                                <argument>-xzvf</argument>
+                                <argument>
+                                    ${project.build.directory}/${tarball_top_source_directory}/dist/redfish-${version.redfish}.linux-x86_64.tar.gz
+                                </argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
